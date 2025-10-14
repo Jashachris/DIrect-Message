@@ -4,9 +4,23 @@ const multer = require('multer');
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const fs = require('fs');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// Rate limiting configuration
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit file uploads to 10 per 15 minutes
+  message: 'Too many upload attempts, please try again later.'
+});
 
 // Middleware
 app.use(bodyParser.json());
@@ -82,7 +96,7 @@ function initializeDatabase() {
 // Routes
 
 // Get all users
-app.get('/api/users', (req, res) => {
+app.get('/api/users', apiLimiter, (req, res) => {
   db.all('SELECT id, username, profile_image, created_at FROM users', (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
@@ -93,7 +107,7 @@ app.get('/api/users', (req, res) => {
 });
 
 // Get user by ID
-app.get('/api/users/:id', (req, res) => {
+app.get('/api/users/:id', apiLimiter, (req, res) => {
   db.get('SELECT id, username, profile_image, created_at FROM users WHERE id = ?', 
     [req.params.id], 
     (err, row) => {
@@ -111,7 +125,7 @@ app.get('/api/users/:id', (req, res) => {
 });
 
 // Create a new user
-app.post('/api/users', (req, res) => {
+app.post('/api/users', apiLimiter, (req, res) => {
   const { username } = req.body;
   
   if (!username) {
@@ -135,7 +149,7 @@ app.post('/api/users', (req, res) => {
 });
 
 // Upload profile image
-app.post('/api/users/:id/upload-image', upload.single('profileImage'), (req, res) => {
+app.post('/api/users/:id/upload-image', uploadLimiter, upload.single('profileImage'), (req, res) => {
   if (!req.file) {
     res.status(400).json({ error: 'No file uploaded' });
     return;
@@ -183,7 +197,7 @@ app.post('/api/users/:id/upload-image', upload.single('profileImage'), (req, res
 });
 
 // Send a message
-app.post('/api/messages', (req, res) => {
+app.post('/api/messages', apiLimiter, (req, res) => {
   const { sender_id, receiver_id, message } = req.body;
 
   if (!sender_id || !receiver_id || !message) {
@@ -208,7 +222,7 @@ app.post('/api/messages', (req, res) => {
 });
 
 // Get messages between two users
-app.get('/api/messages/:userId1/:userId2', (req, res) => {
+app.get('/api/messages/:userId1/:userId2', apiLimiter, (req, res) => {
   const { userId1, userId2 } = req.params;
 
   db.all(
