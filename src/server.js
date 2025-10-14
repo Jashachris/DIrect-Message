@@ -3,15 +3,27 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const { apiLimiter } = require('./middleware/rateLimiter');
 
 dotenv.config();
 
 const app = express();
 
+// Security middleware
+app.use(helmet());
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
+
+// Sanitize data to prevent MongoDB injection
+app.use(mongoSanitize());
+
+// Apply rate limiting to all API routes
+app.use('/api/', apiLimiter);
 
 // Database connection
 const connectDB = async () => {

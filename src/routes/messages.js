@@ -8,11 +8,12 @@ const {
   getUsers
 } = require('../controllers/messageController');
 const auth = require('../middleware/auth');
+const { messageLimiter } = require('../middleware/rateLimiter');
 
 // All message routes require authentication
 router.use(auth);
 
-router.post('/', sendMessage);
+router.post('/', messageLimiter, sendMessage);
 router.get('/conversations', getConversations);
 router.get('/conversation/:userId', getConversation);
 router.patch('/:messageId/read', markAsRead);
