@@ -207,11 +207,17 @@ DIrect-Message/
 
 ## Security Features
 
-- Passwords are hashed using bcrypt before storage
-- JWT tokens for secure authentication
-- Protected API routes requiring authentication
-- Input validation on all endpoints
-- CORS enabled for cross-origin requests
+- **Password Security**: Passwords are hashed using bcrypt before storage
+- **JWT Authentication**: Secure token-based authentication
+- **Protected Routes**: API routes require authentication
+- **Input Validation**: All endpoints validate user input
+- **Rate Limiting**: Prevents DoS attacks with configurable rate limits
+  - Auth endpoints: 5 requests per 15 minutes
+  - Message sending: 30 requests per minute
+  - General API: 100 requests per 15 minutes
+- **NoSQL Injection Protection**: Mongoose provides parameterized queries
+- **Security Headers**: Helmet.js for secure HTTP headers
+- **CORS**: Configured for cross-origin requests
 
 ## Development
 

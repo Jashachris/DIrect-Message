@@ -6,5 +6,6 @@ module.exports = {
     '!src/server.js'
   ],
   testMatch: ['**/tests/**/*.test.js'],
-  testTimeout: 10000
+  testTimeout: 10000,
+  setupFiles: ['<rootDir>/tests/setup.js']
 };

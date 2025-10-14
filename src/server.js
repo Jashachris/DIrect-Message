@@ -4,7 +4,6 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
 const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
 const { apiLimiter } = require('./middleware/rateLimiter');
 
 dotenv.config();
@@ -17,13 +16,12 @@ app.use(helmet());
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
-
-// Sanitize data to prevent MongoDB injection
-app.use(mongoSanitize());
 
 // Apply rate limiting to all API routes
 app.use('/api/', apiLimiter);
+
+// Serve static files
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Database connection
 const connectDB = async () => {
@@ -33,7 +31,10 @@ const connectDB = async () => {
     console.log('MongoDB connected successfully');
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    process.exit(1);
+    // Only exit in production, not during testing
+    if (process.env.NODE_ENV !== 'test') {
+      process.exit(1);
+    }
   }
 };
 
@@ -64,8 +65,11 @@ const startServer = async () => {
   });
 };
 
+// Only connect to database when not in test environment
 if (require.main === module) {
   startServer();
+} else if (process.env.NODE_ENV !== 'test') {
+  connectDB();
 }
 
 module.exports = app;
