@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIrect Message - Chat App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>DIrect Message</h1>
+            <p class="subtitle">Simple Direct Messaging with Profile Images</p>
+        </header>
+
+        <div class="main-content">
+            <!-- User Management Section -->
+            <div class="section" id="user-section">
+                <h2>User Management</h2>
+                
+                <div class="form-group">
+                    <h3>Create User</h3>
+                    <input type="text" id="new-username" placeholder="Enter username">
+                    <button onclick="createUser()">Create User</button>
+                </div>
+
+                <div class="form-group">
+                    <h3>Upload Profile Image</h3>
+                    <select id="user-select">
+                        <option value="">Select a user...</option>
+                    </select>
+                    <input type="file" id="profile-image" accept="image/*">
+                    <button onclick="uploadProfileImage()">Upload Image</button>
+                </div>
+
+                <div id="users-list">
+                    <h3>All Users</h3>
+                    <div id="users-container"></div>
+                </div>
+            </div>
+
+            <!-- Messaging Section -->
+            <div class="section" id="messaging-section">
+                <h2>Send Messages</h2>
+                
+                <div class="form-group">
+                    <label for="sender-select">From:</label>
+                    <select id="sender-select">
+                        <option value="">Select sender...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="receiver-select">To:</label>
+                    <select id="receiver-select">
+                        <option value="">Select receiver...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <textarea id="message-text" placeholder="Type your message here..." rows="4"></textarea>
+                    <button onclick="sendMessage()">Send Message</button>
+                </div>
+
+                <div id="messages-display">
+                    <h3>Conversation</h3>
+                    <button onclick="loadMessages()">Load Messages</button>
+                    <div id="messages-container"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
